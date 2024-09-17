@@ -93,13 +93,6 @@
     <div>Gamma-Rotation = <span id="gamma-rot"></span></div>
 
 
-    <script src="https://unpkg.com/edge-ml/dist/bundle.js"></script>
-    <script>
-      sendDataset = edgeML.sendDataset
-      datasetCollector = edgeML.datasetCollector
-      Predictor = edgeML.Predictor
-    </script>
-
     <button id="test">TEST</button>
 
   <script>
@@ -123,6 +116,7 @@
     const datasetCollector = require("edge-ml").datasetCollector;
     const Predictor = require("edge-ml").Predictor;
 
+    /*
     // Generate collector function
     try {
       var collector = await datasetCollector(
@@ -163,7 +157,7 @@
     
 
     // Add event listener to the toggle switch
-    /*
+    
     toggleSwitch.addEventListener('change', function() {
       if (this.checked) {
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
