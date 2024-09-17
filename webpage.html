@@ -69,13 +69,11 @@
 </head>
 <body>
 
-  <h2>Form with Text Field, Toggle Switch, and DeviceMotionEvent</h2>
 
-  <form>
     <!-- Text Field for Context -->
     <div class="form-group">
       <label for="context">Context:</label>
-      <input type="text" id="context" name="context" placeholder="Enter context here..." required>
+      <input type="text" id="context" name="context" placeholder="Enter context here...">
     </div>
 
     <!-- Toggle Switch -->
@@ -87,11 +85,22 @@
       </label>
     </div>
 
-    <!-- Submit Button -->
-    <button type="submit">Submit</button>
-  </form>
+    <div>X-Acceleration = <span id="x-acc"></span></div>
+    <div>Y-Acceleration = <span id="y-acc"></span></div>
+    <div>Z-Acceleration = <span id="z-acc"></span></div>
+    <div>Alpha-Rotation = <span id="alpha-rot"></span></div>
+    <div>Beta-Rotation = <span id="beta-rot"></span></div>
+    <div>Gamma-Rotation = <span id="gamma-rot"></span></div>
 
-  <p id="motion-data"></p>
+
+    <script src="https://unpkg.com/edge-ml/dist/bundle.js"></script>
+    <script>
+      sendDataset = edgeML.sendDataset
+      datasetCollector = edgeML.datasetCollector
+      Predictor = edgeML.Predictor
+    </script>
+
+    <button id="test">TEST</button>
 
   <script>
     // Selecting the toggle switch
@@ -99,12 +108,59 @@
 
     if (window.DeviceOrientationEvent) {
         
-        window.addEventListener('devicemotion', function() {
+        window.addEventListener('devicemotion', event => {
             if (toggleSwitch.checked) {
-            alert("HELLO")
+              document.getElementById('x-acc').innerText = event.acceleration.x
+              document.getElementById('y-acc').innerText = event.acceleration.y
+              document.getElementById('z-acc').innerText = event.acceleration.z
+              document.getElementById('alpha-rot').innerText = event.rotationRate.alpha
+              document.getElementById('beta-rot').innerText = event.rotationRate.beta
+              document.getElementById('gamma-rot').innerText = event.rotationRate.gamma
             }
     })
     }
+
+    const datasetCollector = require("edge-ml").datasetCollector;
+    const Predictor = require("edge-ml").Predictor;
+
+    // Generate collector function
+    try {
+      var collector = await datasetCollector(
+        "https://app.edge-ml.org", // Backend-URL
+        "48df1ec9d9aec69b9f9d4fcca2ae5929", // API-Write-Key
+        "Testdata", // Name for the dataset
+        false, // False to provide own timestamps
+        ["accX", "accY", "accZ", "rotX", "rotY", "rotZ"], // Name of the time-series to create in the dataset
+
+        // These two parameters can be omitted
+        {  }, // Metadata: {} to omit
+        "testlabel" // Labeling and label for the whole dataset. Format: {labeling}_{label}
+      );
+    } catch (e) {
+      // Error occurred, cannot use the collector as a function to upload.
+      console.log(e);
+    }
+
+    document.getElementById('test').addEventListener('click', { async function(){
+      try {
+        // Function expects 3 arguments
+        collector.addDataPoint(
+          1618760114000, // Timestamp to set in unix milliseconds
+          "sensorName", // Name of the sensor
+          1.23 // Value
+        );
+
+        // Tells the libarary that all data has been recorded.
+        // Uploads all remaining datapoints to the server
+        await collector.onComplete();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+    ) 
+
+    
 
     // Add event listener to the toggle switch
     /*
