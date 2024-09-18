@@ -72,15 +72,23 @@
 
     <!-- Text Field for Context -->
     <div class="form-group">
-      <label for="context">Context:</label>
-      <input type="text" id="context" name="context" placeholder="Enter context here...">
+      <label for="context">Context: <span id="activity"></span></label>
     </div>
 
     <!-- Toggle Switch -->
     <div class="form-group">
-      <label for="toggle">Toggle Switch (Enable Device Motion Event):</label>
+      <label for="toggle">Enable Device Motion Event:</label>
       <label class="switch">
         <input type="checkbox" id="toggle" name="toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Toggle Switch -->
+    <div class="form-group">
+      <label for="toggle">Activate ML Predictor:</label>
+      <label class="switch">
+        <input type="checkbox" id="ml" name="toggle">
         <span class="slider"></span>
       </label>
     </div>
@@ -95,8 +103,6 @@
     <div>Beta-Rotation = <span id="beta-rot"></span></div>
     <div>Gamma-Rotation = <span id="gamma-rot"></span></div>
 
-
-    <button id="test">TEST</button>
   <script src="random_forest_model.js"></script>
   <script>
 
@@ -121,7 +127,25 @@
     })
     }
 
-    document.getElementById('test').addEventListener('click', function(){
+    document.getElementById('ml').addEventListener('change', handleToggle)
+
+    let intervalId = null;
+
+    // Function to handle the toggle
+    function handleToggle() {
+    const toggleButton = document.getElementById('ml');
+
+    if (toggleButton.checked) {
+        // If the toggle is on, start the interval
+        intervalId = setInterval(predict, 500); // Call myFunction every 500ms
+    } else {
+        // If the toggle is off, clear the interval
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+}
+
+    function predict() {
       const input = [
         parseFloat(document.getElementById('x-acc-grav').innerText), 
         parseFloat(document.getElementById('y-acc-grav').innerText),
@@ -134,8 +158,20 @@
         parseFloat(document.getElementById('gamma-rot').innerText),
       ]
       result=score(input)
-      alert(result.indexOf(Math.max(...result)))
-    })
+      document.getElementById('activity').innerText = (convertResult(result.indexOf(Math.max(...result))))
+    }
+
+    function convertResult(i) {
+      if(i==0) {
+        return "still"
+      } else if(i==1) {
+        return "usage" 
+      } else if (i==2) {
+        return "walking"
+      } else {
+        return "error"
+      }
+    }
     
     
     /* This was for getting data
