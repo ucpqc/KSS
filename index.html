@@ -88,14 +88,19 @@
     <div>X-Acceleration = <span id="x-acc"></span></div>
     <div>Y-Acceleration = <span id="y-acc"></span></div>
     <div>Z-Acceleration = <span id="z-acc"></span></div>
+    <div>X-Acceleration-With-Gravity = <span id="x-acc-grav"></span></div>
+    <div>Y-Acceleration-With-Gravity = <span id="y-acc-grav"></span></div>
+    <div>Z-Acceleration-With-Gravity = <span id="z-acc-grav"></span></div>
     <div>Alpha-Rotation = <span id="alpha-rot"></span></div>
     <div>Beta-Rotation = <span id="beta-rot"></span></div>
     <div>Gamma-Rotation = <span id="gamma-rot"></span></div>
 
 
     <button id="test">TEST</button>
-
+  <script src="random_forest_model.js"></script>
   <script>
+
+
     // Selecting the toggle switch
     const toggleSwitch = document.getElementById('toggle');
 
@@ -106,6 +111,9 @@
               document.getElementById('x-acc').innerText = event.acceleration.x
               document.getElementById('y-acc').innerText = event.acceleration.y
               document.getElementById('z-acc').innerText = event.acceleration.z
+              document.getElementById('x-acc-grav').innerText = event.accelerationIncludingGravity.x
+              document.getElementById('y-acc-grav').innerText = event.accelerationIncludingGravity.y
+              document.getElementById('z-acc-grav').innerText = event.accelerationIncludingGravity.z
               document.getElementById('alpha-rot').innerText = event.rotationRate.alpha
               document.getElementById('beta-rot').innerText = event.rotationRate.beta
               document.getElementById('gamma-rot').innerText = event.rotationRate.gamma
@@ -113,15 +121,33 @@
     })
     }
 
+    document.getElementById('test').addEventListener('click', function(){
+      const input = [
+        parseFloat(document.getElementById('x-acc-grav').innerText), 
+        parseFloat(document.getElementById('y-acc-grav').innerText),
+        parseFloat(document.getElementById('z-acc-grav').innerText),
+        parseFloat(document.getElementById('x-acc-grav').innerText),
+        parseFloat(document.getElementById('y-acc-grav').innerText),
+        parseFloat(document.getElementById('z-acc-grav').innerText),
+        parseFloat(document.getElementById('alpha-rot').innerText),
+        parseFloat(document.getElementById('beta-rot').innerText),
+        parseFloat(document.getElementById('gamma-rot').innerText),
+      ]
+      result=score(input)
+      alert(result.indexOf(Math.max(...result)))
+    })
+    
+    
+    /* This was for getting data
+
     const datasetCollector = require("edge-ml").datasetCollector;
     const Predictor = require("edge-ml").Predictor;
 
-    /*
     // Generate collector function
     try {
-      var collector = await datasetCollector(
+      var collector = datasetCollector(
         "https://app.edge-ml.org", // Backend-URL
-        "48df1ec9d9aec69b9f9d4fcca2ae5929", // API-Write-Key
+        "cb0641ab4fb6de726a197ec0fd242035", // API-Write-Key
         "Testdata", // Name for the dataset
         false, // False to provide own timestamps
         ["accX", "accY", "accZ", "rotX", "rotY", "rotZ"], // Name of the time-series to create in the dataset
@@ -135,6 +161,7 @@
       console.log(e);
     }
 
+    
     document.getElementById('test').addEventListener('click', { async function(){
       try {
         // Function expects 3 arguments
@@ -151,10 +178,9 @@
         console.log(e);
       }
     }
+      
   }
     ) 
-
-    
 
     // Add event listener to the toggle switch
     
