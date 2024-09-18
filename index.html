@@ -33,6 +33,10 @@
       height: 0;
     }
 
+    .switch:disabled{
+      color: #cccccc79;
+    }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -61,8 +65,20 @@
       background-color: #4caf50;
     }
 
+        /* Styling for the disabled state of the switch */
+    input:disabled + .slider{
+      background-color: #d61111;
+      cursor: not-allowed;
+    }
+
+
     input:checked + .slider:before {
       transform: translateX(26px);
+    }
+
+    input:disabled + .slider:before{
+      background-color: #d61111;
+      cursor: not-allowed;
     }
 
   </style>
@@ -107,8 +123,8 @@
   <script>
 
 
-    // Selecting the toggle switch
     const toggleSwitch = document.getElementById('toggle');
+    const mlSwitch = document.getElementById('ml');
 
     if (window.DeviceOrientationEvent) {
         
@@ -127,15 +143,14 @@
     })
     }
 
-    document.getElementById('ml').addEventListener('change', handleToggle)
+    mlSwitch.addEventListener('change', handleToggle)
 
     let intervalId = null;
 
     // Function to handle the toggle
     function handleToggle() {
-    const toggleButton = document.getElementById('ml');
 
-    if (toggleButton.checked) {
+    if (mlSwitch.checked) {
         // If the toggle is on, start the interval
         intervalId = setInterval(predict, 500); // Call myFunction every 500ms
     } else {
@@ -161,12 +176,23 @@
       document.getElementById('activity').innerText = (convertResult(result.indexOf(Math.max(...result))))
     }
 
+    let stillCounter = 0
     function convertResult(i) {
+      mlSwitch.disabled = false
+      toggleSwitch.disabled = false
       if(i==0) {
+        stillCounter += 1
+        if (stillCounter > 2) {
+          document.body.style.background = 'grey'
+        }
         return "still"
       } else if(i==1) {
+        document.body.style.background = 'white'
         return "usage" 
       } else if (i==2) {
+        document.body.style.background = 'white'
+        mlSwitch.disabled = true
+        toggleSwitch.disabled = true
         return "walking"
       } else {
         return "error"
